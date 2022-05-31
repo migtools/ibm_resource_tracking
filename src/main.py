@@ -29,4 +29,4 @@ if __name__ == '__main__':
     get_resource_usage()
     # get_all_users()
 
-    print(get_cluster_info(get_iam_api_key()))
+    print(get_cluster_info())

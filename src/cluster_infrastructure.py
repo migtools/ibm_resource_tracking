@@ -1,42 +1,10 @@
 import requests
 import json
 
+from config_helper import get_account_id, get_iam_api_key
+
 # Returns a list of dicts containing information about each cluster from the IBM API.
-def get_cluster_info(ibm_cloud_api_key):
-  account_iam_req = requests.post(
-    "https://iam.cloud.ibm.com/identity/token",
-    headers={
-      "Content-Type": "application/x-www-form-urlencoded",
-      "Authorization": "Basic Yng6Yng="
-    },
-    data={
-      "grant_type": "urn:ibm:params:oauth:grant-type:apikey",
-      "response_type": "cloud_iam uaa",
-      "apikey": ibm_cloud_api_key,
-      "uaa_client_id": "cf",
-      "uaa_client_secret": ""
-    }
-  )
-
-  account_iam = json.loads(account_iam_req.text)
-
-  accounts_req = requests.get(
-    "https://accounts.cloud.ibm.com/coe/v2/accounts",
-    headers={
-      "Content-Type": "application/json",
-      "Authorization": "bearer " + account_iam["access_token"],
-      "Accept": "application/json"
-    }
-  )
-
-  accounts = json.loads(accounts_req.text)
-
-  if accounts["total_results"] > 1:
-    print("Handle more than one account!")
-
-  account_guid = accounts['resources'][0]['metadata']['guid']
-
-
+def get_cluster_info():
   cluster_iam_req = requests.post(
     "https://iam.cloud.ibm.com/identity/token",
     headers={
@@ -46,16 +14,15 @@ def get_cluster_info(ibm_cloud_api_key):
     data={
       "grant_type": "urn:ibm:params:oauth:grant-type:apikey",
       "response_type": "cloud_iam uaa",
-      "apikey": ibm_cloud_api_key,
+      "apikey": get_iam_api_key(),
       "uaa_client_id": "cf",
       "uaa_client_secret": "",
-      "bss_account": account_guid
+      "bss_account": get_account_id()
     }
   )
 
   cluster_iam = json.loads(cluster_iam_req.text)
 
-  output = { "clusters": [] }
   # --- Clusters ---
   # --- Classic clusters ---
   get_classic_clusters_req = requests.get(
