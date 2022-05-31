@@ -1,2 +1,3 @@
-ibm_vpc
-ibm_cloud_sdk_core
+ibm-cloud-sdk-core
+ibm-platform-services
+ibm-vpc
