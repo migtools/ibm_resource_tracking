@@ -1,6 +1,7 @@
 import requests
 import json
 
+# Returns a list of dicts containing information about each cluster from the IBM API.
 def get_cluster_info(ibm_cloud_api_key):
   account_iam_req = requests.post(
     "https://iam.cloud.ibm.com/identity/token",
@@ -71,10 +72,3 @@ def get_cluster_info(ibm_cloud_api_key):
   get_vpc_clusters = json.loads(get_vpc_clusters_req.text)
 
   return get_classic_clusters + get_vpc_clusters
-
-def extract_relevant_cluster_info(clusters):
-  output = []
-  for cluster in clusters:
-    pass
-
-  return output
