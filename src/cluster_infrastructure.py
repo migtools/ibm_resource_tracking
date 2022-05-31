@@ -11,7 +11,7 @@ def get_cluster_info(ibm_cloud_api_key):
     data={
       "grant_type": "urn:ibm:params:oauth:grant-type:apikey",
       "response_type": "cloud_iam uaa",
-      "apikey": os.environ.get('IBM_CLOUD_API_KEY'),
+      "apikey": ibm_cloud_api_key,
       "uaa_client_id": "cf",
       "uaa_client_secret": ""
     }
@@ -45,7 +45,7 @@ def get_cluster_info(ibm_cloud_api_key):
     data={
       "grant_type": "urn:ibm:params:oauth:grant-type:apikey",
       "response_type": "cloud_iam uaa",
-      "apikey": os.environ.get('IBM_CLOUD_API_KEY'),
+      "apikey": ibm_cloud_api_key,
       "uaa_client_id": "cf",
       "uaa_client_secret": "",
       "bss_account": account_guid
@@ -56,7 +56,6 @@ def get_cluster_info(ibm_cloud_api_key):
 
   # --- Clusters ---
   # --- Classic clusters ---
-
   get_classic_clusters_req = requests.get(
     "https://containers.cloud.ibm.com/global/v2/classic/getClusters",
     headers={ "Authorization": "bearer " + cluster_iam['access_token'] }
