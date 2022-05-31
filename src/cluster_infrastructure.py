@@ -70,8 +70,11 @@ def get_cluster_info(ibm_cloud_api_key):
   )
   get_vpc_clusters = json.loads(get_vpc_clusters_req.text)
 
-  return {
-    "sheetName": "clusters",
-    "values": get_classic_clusters + get_vpc_clusters
-  }
-    
+  return get_classic_clusters + get_vpc_clusters
+
+def extract_relevant_cluster_info(clusters):
+  output = []
+  for cluster in clusters:
+    pass
+
+  return output

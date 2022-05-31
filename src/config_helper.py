@@ -16,6 +16,9 @@ authenticator = IAMAuthenticator(iam_apikey)
 def get_iam_authenticator():
     return authenticator
 
+def get_iam_api_key():
+    return iam_apikey
+
 
 def get_vpc_service():
     service = VpcV1(authenticator=authenticator)
