@@ -2,10 +2,11 @@ import json
 
 from ibm_cloud_sdk_core import ApiException
 
-from src.config_helper import get_user_management_service, get_account_id
+# from src.config_helper import get_user_management_service, get_account_id, get_iam_api_key
+from config_helper import get_user_management_service, get_account_id, get_iam_api_key
 from usage_report import get_account_summary, get_resource_usage
 from vpc_infrastructure import get_vpc_infrastructure_data, print_vpc_infrastructure_data
-
+from cluster_infrastructure import get_cluster_info
 
 # List users
 def get_all_users():
@@ -18,6 +19,8 @@ def get_all_users():
         print("List Users failed with status code: {0} : {1}".format(e.code, e.message))
 
 
+
+
 if __name__ == '__main__':
     data = get_vpc_infrastructure_data()
     print_vpc_infrastructure_data(data)
@@ -25,3 +28,5 @@ if __name__ == '__main__':
     get_account_summary()
     get_resource_usage()
     # get_all_users()
+
+    print(get_cluster_info())
