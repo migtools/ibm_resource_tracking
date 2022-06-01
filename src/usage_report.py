@@ -1,4 +1,3 @@
-import datetime
 import json
 
 from ibm_cloud_sdk_core import ApiException
@@ -7,14 +6,12 @@ from resource_instances import get_instances
 
 
 # Get IBM Account Summary
-# https://cloud.ibm.com/apidocs/usage-reports?code=python#get-account-summary
-def get_account_summary():
+# https://cloud.ibm.com/apidocs/metering-reporting?code=python#get-account-summary
+def get_account_summary(bill_month):
     print("Get IBM Account Summary")
     try:
-        now = datetime.datetime.now()
-        billMonth = str(now.year) + "-" + str(now.month)
         service = get_usage_report_service()
-        account_summary = service.get_account_summary(account_id=get_account_id(), billingmonth=billMonth).get_result()
+        account_summary = service.get_account_summary(account_id=get_account_id(), billingmonth=bill_month).get_result()
 
         # Print resources billable_cost
         print("\nAccount Summary")
@@ -29,23 +26,20 @@ def get_account_summary():
 
 # Get IBM Resource Usage
 # https://cloud.ibm.com/apidocs/metering-reporting?code=python#get-resource-usage-account
-def get_all_resource_instance_usage():
+def get_all_resource_instance_usage(bill_month):
     print("Get IBM All Resource Instance Usage")
     resource_instance_usage_dict = {}
     try:
-        now = datetime.datetime.now()
-        billMonth = str(now.year) + "-" + str(now.month)
         service = get_usage_report_service()
         start = None
         # Get all available resource instances usage
         while True:
             usage_response = service.get_resource_usage_account(account_id=get_account_id(),
-                                                                billingmonth=billMonth,
+                                                                billingmonth=bill_month,
                                                                 start=start).get_result()
             # Extract all resource instances usage and its cost
             for resource in usage_response['resources']:
                 cost = 0
-
                 for usage in resource['usage']:
                     cost += usage['cost']
 
@@ -70,22 +64,18 @@ def get_all_resource_instance_usage():
 
 # Get resource instance usage in an account for a specific resource instance
 # https://cloud.ibm.com/apidocs/metering-reporting?code=python#get-resource-usage-account
-def get_resource_instance_usage():
+def get_resource_instance_usage(bill_month):
     print("Get IBM Resource Instance Usage")
     try:
         resource_instance_usage_list = list()
-        now = datetime.datetime.now()
-        billMonth = str(now.year) + "-" + str(now.month)
         service = get_usage_report_service()
-
         instances = get_instances()
         # For each instance, get the instance id and get its usage
         for instance in instances:
             instance_id = instance['instance_id']
             instance_usage = service.get_resource_usage_account(account_id=get_account_id(),
-                                                                billingmonth=billMonth,
-                                                                resource_instance_id=instance_id).get_result()[
-                'resources']
+                                                                billingmonth=bill_month,
+                                                                resource_instance_id=instance_id).get_result()['resources']
             # print(json.dumps(instance_usage, indent=2))
             for resource in instance_usage:
                 cost = 0
