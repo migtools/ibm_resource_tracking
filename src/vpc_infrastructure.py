@@ -4,6 +4,7 @@ from config_helper import get_vpc_service
 vpc_infrastructure_data = {'VPCs': [], 'Subnets': [], 'Instances': [], 'Public Gateways': []}
 
 
+# Get all VPCs, IBM Cloud API returns a list of VPCs
 def get_all_vpcs():
     try:
         service = get_vpc_service()
@@ -45,10 +46,8 @@ def get_all_instances():
 
 def add_resource_details(resources, resource_type):
     for resource in resources:
-        # Create a dictionary of resource details
         resource_details = {'id': resource['id'], 'name': resource['name'],
                             'status': resource['status'], 'created_at': resource['created_at']}
-        # Add the resource details to the global dictionary
         vpc_infrastructure_data[resource_type].append(resource_details)
 
 
