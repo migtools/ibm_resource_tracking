@@ -2,8 +2,8 @@ import datetime
 import json
 
 from ibm_cloud_sdk_core import ApiException
-
 from config_helper import get_usage_report_service, get_account_id
+from resource_instances import get_instances
 
 
 # Get IBM Account Summary
@@ -28,37 +28,94 @@ def get_account_summary():
 
 
 # Get IBM Resource Usage
-# https://cloud.ibm.com/apidocs/usage-reports?code=python#get-resource-usage
-def get_resource_usage():
-    print("Get IBM Resource Usage")
+# https://cloud.ibm.com/apidocs/metering-reporting?code=python#get-resource-usage-account
+def get_all_resource_instance_usage():
+    print("Get IBM All Resource Instance Usage")
+    resource_instance_usage_dict = {}
     try:
-        resource_usage_list = list()
         now = datetime.datetime.now()
         billMonth = str(now.year) + "-" + str(now.month)
         service = get_usage_report_service()
-        resource_usage = service.get_resource_usage_account(account_id=get_account_id(),
-                                                            billingmonth=billMonth,
-                                                            resource_id='containers-kubernetes').get_result()
+        start = None
+        # Get all available resource instances usage
+        while True:
+            usage_response = service.get_resource_usage_account(account_id=get_account_id(),
+                                                                billingmonth=billMonth,
+                                                                start=start).get_result()
+            # Extract all resource instances usage and its cost
+            for resource in usage_response['resources']:
+                cost = 0
 
-        # Print resources cost
-        print("\nResource Usage")
-        # print(json.dumps(resource_usage, indent=2))
-        count = 0
-        for resource in resource_usage['resources']:
-            count += 1
-            cost = 0
-            for usage in resource['usage']:
-                cost += usage['cost']
+                for usage in resource['usage']:
+                    cost += usage['cost']
 
-            # Create a dictionary of resource details
-            resource_details = {'resource_instance_id': resource['resource_instance_id'],
-                                'resource_group_id': resource['resource_group_id'],
-                                'resource_id': resource['resource_id'],
-                                'region': resource['region'],
-                                'cost': cost}
-            resource_usage_list.append(resource_details)
-            print(json.dumps(resource_details, indent=2))
-            # print("\n")
-        print("Total Resources: " + str(count))
+                instance_usage = {'instance_id': resource['resource_instance_id'], 'cost': cost,
+                                  'consumer_id': resource['consumer_id'] if 'consumer_id' in resource else '-'}
+                if resource['resource_instance_id'] in resource_instance_usage_dict:
+                    resource_instance_usage_dict[resource['resource_instance_id']].append(instance_usage)
+                else:
+                    resource_instance_usage_dict[resource['resource_instance_id']] = [instance_usage]
+
+            # Check if there are more pages
+            if 'next' not in usage_response:
+                break
+            start = usage_response['next']['offset']
+
+        print("\nResource Usage", len(resource_instance_usage_dict))
+        # print(json.dumps(resource_instance_usage_dict, indent=2))
     except ApiException as e:
-        print("Get IBM Resource Usage failed with status code: {0} : {1}".format(e.code, e.message))
+        print("Get All IBM Resource Instance Usage failed with status code: {0} : {1}".format(e.code, e.message))
+    return resource_instance_usage_dict
+
+
+# Get resource instance usage in an account for a specific resource instance
+# https://cloud.ibm.com/apidocs/metering-reporting?code=python#get-resource-usage-account
+def get_resource_instance_usage():
+    print("Get IBM Resource Instance Usage")
+    try:
+        resource_instance_usage_list = list()
+        now = datetime.datetime.now()
+        billMonth = str(now.year) + "-" + str(now.month)
+        service = get_usage_report_service()
+
+        instances = get_instances()
+        # For each instance, get the instance id and get its usage
+        for instance in instances:
+            instance_id = instance['instance_id']
+            instance_usage = service.get_resource_usage_account(account_id=get_account_id(),
+                                                                billingmonth=billMonth,
+                                                                resource_instance_id=instance_id).get_result()[
+                'resources']
+            # print(json.dumps(instance_usage, indent=2))
+            for resource in instance_usage:
+                cost = 0
+                for usage in resource['usage']:
+                    cost += usage['cost']
+                instance['consumer_id'] = resource['consumer_id'] if 'consumer_id' in resource else '-'
+                instance['cost'] = cost
+                resource_instance_usage_list.append(instance)
+        # Print instance usage
+        print(json.dumps(resource_instance_usage_list, indent=2))
+    except ApiException as e:
+        print("Get IBM Resource Instance Usage failed with status code: {0} : {1}".format(e.code, e.message))
+
+
+def get_all_instances_cost():
+    all_instances = get_instances()
+    all_instances_usage = get_all_resource_instance_usage()
+
+    all_instances_cost = []
+    cost_unknown = []
+    for instance in all_instances:
+        if instance['instance_id'] in all_instances_usage:
+            for instance_usage in all_instances_usage[instance['instance_id']]:
+                instance.update(instance_usage)
+                all_instances_cost.append(instance)
+        else:
+            cost_unknown.append(instance)
+
+    print("\nAll Instances", len(all_instances_cost))
+    print(json.dumps(all_instances_cost, indent=2))
+    print("\n\n\n\nInstances Unknown Cost", len(cost_unknown))
+    print(json.dumps(cost_unknown, indent=2))
+    return all_instances_cost
