@@ -69,7 +69,7 @@ def get_resource_instance_usage(bill_month):
     try:
         resource_instance_usage_list = list()
         service = get_usage_report_service()
-        instances = get_instances()
+        instances,clusters = get_instances()
         # For each instance, get the instance id and get its usage
         for instance in instances:
             instance_id = instance['instance_id']
@@ -91,8 +91,8 @@ def get_resource_instance_usage(bill_month):
 
 
 def get_all_instances_cost():
-    all_instances = get_instances()
-    all_instances_usage = get_all_resource_instance_usage()
+    all_instances,clusters = get_instances()
+    all_instances_usage = get_all_resource_instance_usage("2022-05")
 
     all_instances_cost = []
     cost_unknown = []
