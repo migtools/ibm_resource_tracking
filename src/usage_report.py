@@ -10,6 +10,7 @@ from resource_instances import get_instances
 def get_account_summary(bill_month):
     print("Get IBM Account Summary")
     try:
+        cost_summary = []
         service = get_usage_report_service()
         account_summary = service.get_account_summary(account_id=get_account_id(), billingmonth=bill_month).get_result()
 
@@ -19,7 +20,12 @@ def get_account_summary(bill_month):
         # Display resources and their billable_cost
         print("\nResources and their billable_cost")
         for resource in account_summary['account_resources']:
-            print("Resource: " + resource['resource_name'] + " Billable Cost: " + str(resource['billable_cost']))
+            # print("Resource: " + resource['resource_name'] + " Billable Cost: " + str(resource['billable_cost']))
+            cost_summary.append({
+                "Resource" : resource['resource_name'],
+                "Billable Cost" : str(resource['billable_cost'])
+            })
+        return cost_summary
     except ApiException as e:
         print("Get IBM Account Summary failed with status code: {0} : {1}".format(e.code, e.message))
 
@@ -43,8 +49,7 @@ def get_all_resource_instance_usage(bill_month):
                 for usage in resource['usage']:
                     cost += usage['cost']
 
-                instance_usage = {'instance_id': resource['resource_instance_id'], 'cost': cost,
-                                  'consumer_id': resource['consumer_id'] if 'consumer_id' in resource else '-'}
+                instance_usage = {'instance_id': resource['resource_instance_id'], 'cost': cost}
                 if resource['resource_instance_id'] in resource_instance_usage_dict:
                     resource_instance_usage_dict[resource['resource_instance_id']].append(instance_usage)
                 else:
@@ -69,7 +74,7 @@ def get_resource_instance_usage(bill_month):
     try:
         resource_instance_usage_list = list()
         service = get_usage_report_service()
-        instances = get_instances()
+        instances,clusters = get_instances()
         # For each instance, get the instance id and get its usage
         for instance in instances:
             instance_id = instance['instance_id']
@@ -81,7 +86,7 @@ def get_resource_instance_usage(bill_month):
                 cost = 0
                 for usage in resource['usage']:
                     cost += usage['cost']
-                instance['consumer_id'] = resource['consumer_id'] if 'consumer_id' in resource else '-'
+               
                 instance['cost'] = cost
                 resource_instance_usage_list.append(instance)
         # Print instance usage
@@ -90,9 +95,9 @@ def get_resource_instance_usage(bill_month):
         print("Get IBM Resource Instance Usage failed with status code: {0} : {1}".format(e.code, e.message))
 
 
-def get_all_instances_cost():
-    all_instances = get_instances()
-    all_instances_usage = get_all_resource_instance_usage()
+def get_all_instances_cost(bill_month):
+    all_instances,clusters = get_instances()
+    all_instances_usage = get_all_resource_instance_usage(bill_month)
 
     all_instances_cost = []
     cost_unknown = []

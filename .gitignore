@@ -6,3 +6,5 @@ venv
 # Byte-compiled / optimized / DLL files
 src/__pycache__/
 *.py[cod]
+src/credentials.json
+.env

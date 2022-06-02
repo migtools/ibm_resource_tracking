@@ -39,4 +39,22 @@ def get_cluster_info():
     )
     get_vpc_clusters = json.loads(get_vpc_clusters_req.text)
 
-    return get_classic_clusters + get_vpc_clusters
+    all_clusters = get_classic_clusters + get_vpc_clusters
+
+    cluster_info = []
+
+    for cluster in all_clusters:
+
+        created_at_raw = cluster['createdDate'].split("T")[0].split("-")
+        created_at = created_at_raw[1] + "/" + created_at_raw[2] + "/" +created_at_raw[0]
+
+        cluster_info.append({
+            'cluster_id' : cluster['id'],
+            'name':cluster['name'],
+            'region':cluster['region'],
+            'launchtime': created_at,
+            'worker_count': cluster['workerCount'],
+            'save':''
+        })
+
+    return cluster_info
