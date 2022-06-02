@@ -1,7 +1,7 @@
 import datetime
 from cluster_infrastructure import get_cluster_info
 from usage_report import get_all_instances_cost, get_account_summary
-from sheet import GoogleSheetEditor
+from sheet import GoogleSheetEditor,format_sheet
 from resource_instances import get_instances
 from emailer import send_email,create_email_body,Emailer
 import os
@@ -67,9 +67,10 @@ def main(params):
     print(allClustersSheet.save_data_to_sheet(clusters))
     print(oldClustersSheet.save_data_to_sheet(old_clusters))
 
+    format_sheet()
     
-    # email_body = create_email_body(clusters)
-    # send_email(os.getenv('AWS_ACCESS_KEY_ID'), os.getenv('AWS_ACCESS_SECRET'), os.getenv('SMTP_RECIEVERS'), os.getenv('SMTP_SENDER'), email_body)
+    email_body = create_email_body(clusters)
+    send_email(os.getenv('AWS_ACCESS_KEY_ID'), os.getenv('AWS_ACCESS_SECRET'), os.getenv('SMTP_RECIEVERS'), os.getenv('SMTP_SENDER'), email_body)
 
 
 main({'bill':'2022-05'})
