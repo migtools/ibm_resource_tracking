@@ -15,10 +15,10 @@ class GoogleSheetClient(object):
         self._init_spreadsheet_service()
 
     def _init_spreadsheet_service(self):
-        if not os.path.exists(os.getcwd() + '/src/credentials.json'):
+        if not os.path.exists(os.getcwd() + '/credentials.json'):
             raise Exception("credentials.json not found")
 
-        self.creds = service_account.Credentials.from_service_account_file(os.getcwd() + '/src/credentials.json', 
+        self.creds = service_account.Credentials.from_service_account_file(os.getcwd() + '/credentials.json', 
             scopes=GoogleSheetClient.SCOPES)
         
         self.service = build('sheets', 'v4', credentials=self.creds)

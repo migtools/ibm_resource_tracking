@@ -6,7 +6,7 @@ from ibm_vpc import VpcV1
 import os
 
 config = configparser.ConfigParser()
-config.read(os.getcwd() + '/config/ibm_config.ini')
+config.read(os.getcwd() + '/../config/ibm_config.ini')
 
 # Get IAM API key from config file
 iam_apikey = config['IAM']['apikey']

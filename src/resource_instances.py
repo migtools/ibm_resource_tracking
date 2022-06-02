@@ -13,13 +13,14 @@ def get_instances():
     while True:
         response = service.list_resource_instances(start=start).get_result()
 
-        created_at_raw = resource['created_at'].split("T")[0]
-        created_at = created_at_raw[1] + "/" + created_at_raw[2] + "/" +created_at_raw[0]
-
-        updated_at_raw = resource['updated_at'].split("T")[0]
-        updated_at = updated_at_raw[1] + "/" + updated_at_raw[2] + "/" +updated_at_raw[0]
-
         for resource in response['resources']:
+
+            created_at_raw = resource['created_at'].split("T")[0].split("-")
+            created_at = created_at_raw[1] + "/" + created_at_raw[2] + "/" +created_at_raw[0]
+
+            updated_at_raw = resource['updated_at'].split("T")[0].split("-")
+            updated_at = updated_at_raw[1] + "/" + updated_at_raw[2] + "/" +updated_at_raw[0]
+
             resource_details = {'instance_id': resource['id'], 'name': resource['name'], 'region': resource['region_id'],
                                 'resource_group_id': resource['resource_group_id'], 'type': resource['type'],
                                 'resource_id': resource['resource_id'], 'state': resource['state'],
