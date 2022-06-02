@@ -1,9 +1,11 @@
 import configparser
+import os
+import requests
+import json
 
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 from ibm_platform_services import UsageReportsV4, UserManagementV1, ResourceControllerV2, IamIdentityV1
 from ibm_vpc import VpcV1
-import os
 
 config = configparser.ConfigParser()
 config.read(os.getcwd() + '/../config/ibm_config.ini')
@@ -55,3 +57,25 @@ def get_iam_identity_service():
 
 def get_account_id():
     return config['IAM']['account_id']
+
+
+def get_cluster_access_token():
+    cluster_iam_req = requests.post(
+        "https://iam.cloud.ibm.com/identity/token",
+        headers={
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Authorization": "Basic Yng6Yng="
+        },
+        data={
+            "grant_type": "urn:ibm:params:oauth:grant-type:apikey",
+            "response_type": "cloud_iam uaa",
+            "apikey": get_iam_api_key(),
+            "uaa_client_id": "cf",
+            "uaa_client_secret": "",
+            "bss_account": get_account_id(),
+        }
+    )
+
+    cluster_iam = json.loads(cluster_iam_req.text)
+
+    return cluster_iam['access_token']
