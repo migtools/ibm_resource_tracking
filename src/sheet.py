@@ -1,4 +1,5 @@
 from __future__ import print_function
+from urllib import response
 
 import pytz
 import pickle
@@ -130,3 +131,389 @@ class GoogleSheetEditor():
         if skip_labels:
             return data
         return [column_labels]+data
+
+
+def format_sheet():
+
+    client = GoogleSheetClient()
+
+    request_body = {
+
+        'requests':[
+            # All Instances
+            {
+            'repeatCell': {
+
+                'range': {
+                    'sheetId' : 0, 
+                    'startRowIndex': 3,
+                    'endRowIndex' : 4,
+                    'startColumnIndex':0,
+                    'endColumnIndex':10
+                },
+                'cell':{
+                    'userEnteredFormat':{
+                        'backgroundColor':{
+                            'red': 117,
+                            'green':59,
+                            'blue':25
+                        },
+                        'textFormat':{
+                            'fontSize':12,
+                            'bold':True
+                        }
+                    }
+                },
+            'fields': 'userEnteredFormat(backgroundColor,textFormat)'
+            }
+        },{
+            'repeatCell': {
+
+                'range': {
+                    'sheetId' : 0, 
+                    'startRowIndex': 2,
+                    'endRowIndex' : 3,
+                    'startColumnIndex':0,
+                    'endColumnIndex':2
+                },
+                'cell':{
+                    'userEnteredFormat':{
+                        'backgroundColor':{
+                            'red': 19,
+                            'green':75,
+                            'blue':219
+                        },
+                        'textFormat':{
+                            'fontSize':12,
+                            'bold':True
+                        }
+                    }
+                },
+            'fields': 'userEnteredFormat(backgroundColor,textFormat)'
+            },
+        },
+            ## All cluster Instances
+            {
+            'repeatCell': {
+
+                'range': {
+                    'sheetId' : 1587125586, 
+                    'startRowIndex': 3,
+                    'endRowIndex' : 4,
+                    'startColumnIndex':0,
+                    'endColumnIndex':10
+                },
+                'cell':{
+                    'userEnteredFormat':{
+                        'backgroundColor':{
+                            'red': 117,
+                            'green':59,
+                            'blue':25
+                        },
+                        'textFormat':{
+                            'fontSize':12,
+                            'bold':True
+                        }
+                    }
+                },
+            'fields': 'userEnteredFormat(backgroundColor,textFormat)'
+            }
+            },
+            {
+            'repeatCell': {
+
+                'range': {
+                    'sheetId' : 1587125586, 
+                    'startRowIndex': 2,
+                    'endRowIndex' : 3,
+                    'startColumnIndex':0,
+                    'endColumnIndex':2
+                },
+                'cell':{
+                    'userEnteredFormat':{
+                        'backgroundColor':{
+                            'red': 19,
+                            'green':75,
+                            'blue':219
+                        },
+                        'textFormat':{
+                            'fontSize':12,
+                            'bold':True
+                        }
+                    }
+                },
+            'fields': 'userEnteredFormat(backgroundColor,textFormat)'
+            },
+            },
+
+            #Cost Summary
+
+             {'repeatCell': {
+
+                'range': {
+                    'sheetId' : 1239517681, 
+                    'startRowIndex': 2,
+                    'endRowIndex' : 3,
+                    'startColumnIndex':0,
+                    'endColumnIndex':2
+                },
+                'cell':{
+                    'userEnteredFormat':{
+                        'backgroundColor':{
+                            'red': 19,
+                            'green':75,
+                            'blue':219
+                        },
+                        'textFormat':{
+                            'fontSize':12,
+                            'bold':True
+                        }
+                    }
+                },
+            'fields': 'userEnteredFormat(backgroundColor,textFormat)'
+            }
+    },{
+            'repeatCell': {
+
+                'range': {
+                    'sheetId' : 1239517681, 
+                    'startRowIndex': 3,
+                    'endRowIndex' : 4,
+                    'startColumnIndex':0,
+                    'endColumnIndex':2
+                },
+                'cell':{
+                    'userEnteredFormat':{
+                        'backgroundColor':{
+                            'red': 117,
+                            'green':59,
+                            'blue':25
+                        },
+                        'textFormat':{
+                            'fontSize':12,
+                            'bold':True
+                        }
+                    }
+                },
+            'fields': 'userEnteredFormat(backgroundColor,textFormat)'
+            }},{
+             'repeatCell': {
+
+                'range': {
+                    'sheetId' : 1239517681, 
+                    'startRowIndex': 4,
+                    'startColumnIndex':1,
+                    'endColumnIndex':2
+                },
+                'cell':{
+                    'userEnteredFormat':{
+                        'numberFormat':{
+                            'type':'CURRENCY',
+                            'pattern':'$#,##.00'
+                        },
+                        'textFormat':{
+                            'fontSize':11,
+                            'bold':True
+                        }
+                    }
+                },
+            'fields': 'userEnteredFormat(numberFormat,textFormat)'
+            }},
+            
+            ## Instances cost
+            {
+            'repeatCell': {
+
+                'range': {
+                    'sheetId' : 755432813, 
+                    'startRowIndex': 2,
+                    'endRowIndex' : 3,
+                    'startColumnIndex':0,
+                    'endColumnIndex':2
+                },
+                'cell':{
+                    'userEnteredFormat':{
+                        'backgroundColor':{
+                            'red': 19,
+                            'green':75,
+                            'blue':219
+                        },
+                        'textFormat':{
+                            'fontSize':12,
+                            'bold':True
+                        }
+                    }
+                },
+            'fields': 'userEnteredFormat(backgroundColor,textFormat)'
+            }
+
+            },{
+
+                'repeatCell': {
+
+                'range': {
+                    'sheetId' : 755432813, 
+                    'startRowIndex': 3,
+                    'endRowIndex' : 4,
+                    'startColumnIndex':0,
+                    'endColumnIndex':11
+                },
+                'cell':{
+                    'userEnteredFormat':{
+                        'backgroundColor':{
+                            'red': 117,
+                            'green':59,
+                            'blue':25
+                        },
+                        'textFormat':{
+                            'fontSize':12,
+                            'bold':True
+                        }
+                    }
+                },
+            'fields': 'userEnteredFormat(backgroundColor,textFormat)'
+            }},{
+                'repeatCell': {
+
+                'range': {
+                    'sheetId' : 755432813, 
+                    'startRowIndex': 4,
+                    'startColumnIndex':10,
+                    'endColumnIndex': 11
+                },
+                'cell':{
+                    'userEnteredFormat':{
+                        'numberFormat':{
+                            'type':'CURRENCY',
+                            'pattern':'$#,##.00'
+                        },
+                        'textFormat':{
+                            'fontSize':11,
+                            'bold':True
+                        }
+                    }
+                },
+            'fields': 'userEnteredFormat(numberFormat,textFormat)'
+            }
+
+            },
+            
+
+            ##Old Clusters
+            {
+                'repeatCell': {
+
+                'range': {
+                    'sheetId' : 42437603, 
+                    'startRowIndex': 2,
+                    'endRowIndex' : 3,
+                    'startColumnIndex':0,
+                    'endColumnIndex':2
+                },
+                'cell':{
+                    'userEnteredFormat':{
+                        'backgroundColor':{
+                            'red': 19,
+                            'green':75,
+                            'blue':219
+                        },
+                        'textFormat':{
+                            'fontSize':12,
+                            'bold':True
+                        }
+                    }
+                },
+                'fields': 'userEnteredFormat(backgroundColor,textFormat)'
+                }
+            },{
+                 'repeatCell': {
+
+                'range': {
+                    'sheetId' : 42437603, 
+                    'startRowIndex': 3,
+                    'endRowIndex' : 4,
+                    'startColumnIndex':0,
+                    'endColumnIndex':6
+                },
+                'cell':{
+                    'userEnteredFormat':{
+                        'backgroundColor':{
+                            'red': 117,
+                            'green':59,
+                            'blue':25
+                        },
+                        'textFormat':{
+                            'fontSize':12,
+                            'bold':True
+                        }
+                    }
+                },
+                'fields': 'userEnteredFormat(backgroundColor,textFormat)'
+                }
+            },
+
+
+            ## All Clusters
+
+            {
+                'repeatCell': {
+
+                'range': {
+                    'sheetId' : 846402724, 
+                    'startRowIndex': 2,
+                    'endRowIndex' : 3,
+                    'startColumnIndex':0,
+                    'endColumnIndex':2
+                },
+                'cell':{
+                    'userEnteredFormat':{
+                        'backgroundColor':{
+                            'red': 19,
+                            'green':75,
+                            'blue':219
+                        },
+                        'textFormat':{
+                            'fontSize':12,
+                            'bold':True
+                        }
+                    }
+                },
+                'fields': 'userEnteredFormat(backgroundColor,textFormat)'
+                }
+            },{
+                 'repeatCell': {
+
+                'range': {
+                    'sheetId' : 846402724, 
+                    'startRowIndex': 3,
+                    'endRowIndex' : 4,
+                    'startColumnIndex':0,
+                    'endColumnIndex':6
+                },
+                'cell':{
+                    'userEnteredFormat':{
+                        'backgroundColor':{
+                            'red': 117,
+                            'green':59,
+                            'blue':25
+                        },
+                        'textFormat':{
+                            'fontSize':12,
+                            'bold':True
+                        }
+                    }
+                },
+                'fields': 'userEnteredFormat(backgroundColor,textFormat)'
+                }
+            }
+            
+            ]
+    }
+
+    response = client.service.spreadsheets().batchUpdate(
+        spreadsheetId = os.getenv("SHEET_ID"),
+        body = request_body
+    ).execute()
+
+
+   
