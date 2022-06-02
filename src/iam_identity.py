@@ -9,11 +9,11 @@ def get_iam_id_from_service_id(service_id):
     try:
         service = get_iam_identity_service()
         service_id = service_id.replace('iam-', '')
-        service_id_details = service.get_service_id(id=service_id,
-                                                    include_history=True).get_result()
+        service_id_details = service.get_service_id(id=service_id).get_result()
         return service_id_details['created_by']
     except ApiException as e:
-        print("Get Service Id Details failed with status code: {0} : {1}".format(e.code, e.message))
+        if e.code != 403:
+            print("Get Service Id Details failed with status code: {0} : {1}".format(e.code, e.message))
 
 
 # Get User profile by user's IAM ID

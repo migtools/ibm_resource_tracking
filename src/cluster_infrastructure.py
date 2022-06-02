@@ -1,7 +1,7 @@
-import requests
 import json
+import requests
 
-from config_helper import get_account_id, get_iam_api_key, get_cluster_access_token
+from config_helper import get_cluster_access_token
 
 
 # Returns a list of dicts containing information about each cluster from the IBM API.
@@ -28,20 +28,20 @@ def get_cluster_info():
     cluster_info = []
 
     for cluster in all_clusters:
-
         created_at_raw = cluster['createdDate'].split("T")[0].split("-")
-        created_at = created_at_raw[1] + "/" + created_at_raw[2] + "/" +created_at_raw[0]
+        created_at = created_at_raw[1] + "/" + created_at_raw[2] + "/" + created_at_raw[0]
 
         cluster_info.append({
-            'cluster_id' : cluster['id'],
-            'name':cluster['name'],
-            'region':cluster['region'],
+            'cluster_id': cluster['id'],
+            'name': cluster['name'],
+            'region': cluster['region'],
             'launchtime': created_at,
             'worker_count': cluster['workerCount'],
-            'save':''
+            'save': ''
         })
 
     return cluster_info
+
 
 # Deletes a cluster with the specified id or name. Returns True if successful,
 # False otherwise
@@ -54,21 +54,21 @@ def delete_cluster(id_or_name):
             this_cluster_info = info
             break
 
-    if this_cluster_info == None:
+    if this_cluster_info is None:
         raise Exception('Cluster with id or name "' + id_or_name + '" does not exist!')
 
     print(json.dumps(this_cluster_info))
 
     print(this_cluster_info['resourceGroup'])
 
-    # NOTE: Docs state that v1 API doesn't work for vpc-gen2 clusters, but it 
+    # NOTE: Docs state that v1 API doesn't work for vpc-gen2 clusters, but it
     # seems to work fine for now...
     # https://cloud.ibm.com/apidocs/kubernetes#removecluster
     remove_cluster_req = requests.delete(
         'https://containers.cloud.ibm.com/global/v1/clusters/'
-            + info['cluster_id'] + '?deleteResources=true',
-        headers={ 
-            'Authorization': "bearer " + get_cluster_access_token(), 
+        + info['cluster_id'] + '?deleteResources=true',
+        headers={
+            'Authorization': "bearer " + get_cluster_access_token(),
             'X-Auth-Resource-Group': this_cluster_info['resourceGroup']
         }
     )
@@ -88,3 +88,19 @@ def delete_cluster(id_or_name):
         print('Internal server error')
 
     return False
+
+
+# Get all related instances of a cluster
+def group_cluster_resources(clusters, instances):
+    print("Grouping resources for clusters...")
+    cluster_instances = {}
+
+    # Group instances by cluster
+    for cluster in clusters:
+        cluster_id = cluster['cluster_id']
+        cluster_name = cluster['name']
+        for instance in instances:
+            if cluster_id in instance['name']:
+                cluster_instances[cluster_name] = cluster_instances.get(cluster_name, []) + [instance]
+
+    return cluster_instances

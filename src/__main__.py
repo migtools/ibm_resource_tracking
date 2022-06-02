@@ -1,14 +1,16 @@
 import datetime
-from cluster_infrastructure import get_cluster_info
+from cluster_infrastructure import get_cluster_info, group_cluster_resources
 from usage_report import get_all_instances_cost, get_account_summary
-from sheet import GoogleSheetEditor,format_sheet
+from sheet import GoogleSheetEditor, format_sheet
 from resource_instances import get_instances
-from emailer import send_email,create_email_body,Emailer
+from emailer import send_email, create_email_body, Emailer
 import os
 from dotenv import load_dotenv
+
 load_dotenv()
 
 OLD_INSTANCE_THRESHOLD = 30
+
 
 def get_old_clusters_data(all_instances_sheet, old_instances_sheet, tdelta=datetime.timedelta(days=0)):
     instances = all_instances_sheet.read_spreadsheet()
@@ -23,7 +25,6 @@ def get_old_clusters_data(all_instances_sheet, old_instances_sheet, tdelta=datet
     return old_instances
 
 
-
 def main(params):
     print(params)
 
@@ -33,14 +34,14 @@ def main(params):
     else:
         now = datetime.datetime.now()
         bill_month = str(now.year) + "-" + str(now.month)
-        
-    account_summary = get_account_summary(bill_month)
-    instances,cluster_instances = get_instances()
-    cost = get_all_instances_cost(bill_month)
-    clusters = get_cluster_info()
 
-    
-    
+    account_summary = get_account_summary(bill_month)
+    instances, cluster_instances = get_instances()
+    cost = get_all_instances_cost(bill_month, instances)
+    clusters = get_cluster_info()
+    cluster_instances = group_cluster_resources(clusters, instances)
+    print(account_summary)
+
     sheet_id = os.getenv('SHEET_ID')
 
     allInstancesSheetName = "All Instances"
@@ -49,15 +50,14 @@ def main(params):
     allInstancesCostSheetName = "Instances Cost"
     CostSummarySheetName = "Cost Summary"
     oldClustersSheetName = "Old Clusters"
-    
-    
+
     allInstancesSheet = GoogleSheetEditor(sheet_id, allInstancesSheetName)
     allClustersInstancesSheet = GoogleSheetEditor(sheet_id, allClusterInstancesSheetName)
     allInstancesCostSheet = GoogleSheetEditor(sheet_id, allInstancesCostSheetName)
     allClustersSheet = GoogleSheetEditor(sheet_id, allClustersSheetName)
     allSummarySheet = GoogleSheetEditor(sheet_id, CostSummarySheetName)
     oldClustersSheet = GoogleSheetEditor(sheet_id, oldClustersSheetName)
-    
+
     old_clusters = get_old_clusters_data(allClustersSheet, None, tdelta=datetime.timedelta(days=0))
 
     print(allInstancesSheet.save_data_to_sheet(instances))
@@ -68,9 +68,10 @@ def main(params):
     print(oldClustersSheet.save_data_to_sheet(old_clusters))
 
     format_sheet()
-    
+
     email_body = create_email_body(clusters)
-    send_email(os.getenv('AWS_ACCESS_KEY_ID'), os.getenv('AWS_ACCESS_SECRET'), os.getenv('SMTP_RECIEVERS'), os.getenv('SMTP_SENDER'), email_body)
+    send_email(os.getenv('AWS_ACCESS_KEY_ID'), os.getenv('AWS_ACCESS_SECRET'), os.getenv('SMTP_RECIEVERS'),
+               os.getenv('SMTP_SENDER'), email_body)
 
 
-main({'bill':'2022-05'})
+main({'bill': '2022-05'})
