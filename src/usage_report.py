@@ -2,7 +2,6 @@ import json
 
 from ibm_cloud_sdk_core import ApiException
 from config_helper import get_usage_report_service, get_account_id
-from resource_instances import get_instances
 
 
 # Get IBM Account Summary
@@ -17,13 +16,11 @@ def get_account_summary(bill_month):
         # Print resources billable_cost
         print("\nAccount Summary")
         print("Total Billable Cost: " + str(account_summary['resources']['billable_cost']))
-        # Display resources and their billable_cost
-        print("\nResources and their billable_cost")
+
         for resource in account_summary['account_resources']:
-            # print("Resource: " + resource['resource_name'] + " Billable Cost: " + str(resource['billable_cost']))
             cost_summary.append({
-                "Resource" : resource['resource_name'],
-                "Billable Cost" : str(resource['billable_cost'])
+                "Resource": resource['resource_name'],
+                "Billable Cost": str(resource['billable_cost'])
             })
         return cost_summary
     except ApiException as e:
@@ -49,7 +46,8 @@ def get_all_resource_instance_usage(bill_month):
                 for usage in resource['usage']:
                     cost += usage['cost']
 
-                instance_usage = {'instance_id': resource['resource_instance_id'], 'cost': cost}
+                instance_usage = {'consumer_id': resource['consumer_id'] if 'consumer_id' in resource else '',
+                                  'cost': round(cost, 2)}
                 if resource['resource_instance_id'] in resource_instance_usage_dict:
                     resource_instance_usage_dict[resource['resource_instance_id']].append(instance_usage)
                 else:
@@ -69,12 +67,11 @@ def get_all_resource_instance_usage(bill_month):
 
 # Get resource instance usage in an account for a specific resource instance
 # https://cloud.ibm.com/apidocs/metering-reporting?code=python#get-resource-usage-account
-def get_resource_instance_usage(bill_month):
+def get_resource_instance_usage(bill_month, instances):
     print("Get IBM Resource Instance Usage")
     try:
         resource_instance_usage_list = list()
         service = get_usage_report_service()
-        instances,clusters = get_instances()
         # For each instance, get the instance id and get its usage
         for instance in instances:
             instance_id = instance['instance_id']
@@ -86,31 +83,24 @@ def get_resource_instance_usage(bill_month):
                 cost = 0
                 for usage in resource['usage']:
                     cost += usage['cost']
-               
-                instance['cost'] = cost
+                instance['cost'] = round(cost, 2)
                 resource_instance_usage_list.append(instance)
         # Print instance usage
+        print("\nResource Instance Usage", len(resource_instance_usage_list))
         print(json.dumps(resource_instance_usage_list, indent=2))
     except ApiException as e:
         print("Get IBM Resource Instance Usage failed with status code: {0} : {1}".format(e.code, e.message))
 
 
-def get_all_instances_cost(bill_month):
-    all_instances,clusters = get_instances()
+# Associate cost with resource instance
+def get_all_instances_cost(bill_month, all_instances):
     all_instances_usage = get_all_resource_instance_usage(bill_month)
 
     all_instances_cost = []
-    cost_unknown = []
     for instance in all_instances:
         if instance['instance_id'] in all_instances_usage:
             for instance_usage in all_instances_usage[instance['instance_id']]:
                 instance.update(instance_usage)
                 all_instances_cost.append(instance)
-        else:
-            cost_unknown.append(instance)
 
-    print("\nAll Instances", len(all_instances_cost))
-    print(json.dumps(all_instances_cost, indent=2))
-    print("\n\n\n\nInstances Unknown Cost", len(cost_unknown))
-    print(json.dumps(cost_unknown, indent=2))
     return all_instances_cost
