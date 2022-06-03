@@ -12,14 +12,16 @@ config.read(os.getcwd() + '/../config/ibm_config.ini')
 
 # Get IAM API key from config file
 iam_apikey = config['IAM']['apikey']
+
 # Create an IAM authenticator.
 authenticator = IAMAuthenticator(iam_apikey)
 
-
+# Returns the IAM Authenticator
 def get_iam_authenticator():
     return authenticator
 
 
+# Returns the raw API key
 def get_iam_api_key():
     return iam_apikey
 
@@ -54,11 +56,11 @@ def get_iam_identity_service():
     service = IamIdentityV1(authenticator=authenticator)
     return service
 
-
+# Returns the current account ID
 def get_account_id():
     return config['IAM']['account_id']
 
-
+# Returns the access token used for clusters
 def get_cluster_access_token():
     cluster_iam_req = requests.post(
         "https://iam.cloud.ibm.com/identity/token",
