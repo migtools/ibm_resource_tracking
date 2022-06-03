@@ -488,7 +488,7 @@ def format_sheet():
                     'startRowIndex': 3,
                     'endRowIndex' : 4,
                     'startColumnIndex':0,
-                    'endColumnIndex':6
+                    'endColumnIndex':5
                 },
                 'cell':{
                     'userEnteredFormat':{
