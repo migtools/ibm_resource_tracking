@@ -370,7 +370,7 @@ def format_sheet():
             }, 
             {
                 'repeatCell': {
-                    'range': sheetRange(846402724, 3, 4, 0, 6),
+                    'range': sheetRange(846402724, 3, 4, 0, 5),
                     'cell': {
                         'userEnteredFormat': {
                             **backgroundColor(117, 59, 25),

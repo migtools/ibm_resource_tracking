@@ -65,15 +65,23 @@ def send_email(aws_access_key_id, aws_secret_access_key, toaddresses, fromaddres
 
 
 
-def create_email_body(clusters):
+def create_email_body(clusters,oldClustersSheet):
+
+    existing_old_clusters = oldClustersSheet.read_spreadsheet(indexField='name')
+       
+
     sheet_link = os.environ['SHEET_LINK']
     
     scheduled = (datetime.utcnow() + timedelta(days=4)).strftime("%a, %b %d, %y")
 
     summary_email = ""
 
-    for data in clusters:
-        summary_email += data['name'] + "<br>"
+    for key,val in clusters.items():
+        isSaved = existing_old_clusters.get(key, {}).get('save', '')
+        saved = 'Saved' if isSaved == 'Saved'  else 'Not Saved'
+
+        summary_email += key + " ({} instances) ({})<br>".format(len(val),saved)
+         
 
     message = """
     All,<br>

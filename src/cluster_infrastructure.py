@@ -94,7 +94,7 @@ def delete_cluster(id_or_name):
     elif remove_cluster_req.status_code == 500:
         print('Internal server error')
 
-    return False
+    return remove_cluster_req.status_code
 
 
 # Get all related instances of a cluster
@@ -109,5 +109,6 @@ def group_cluster_resources(clusters, instances):
         for instance in instances:
             if cluster_id in instance['name']:
                 cluster_instances[cluster_name] = cluster_instances.get(cluster_name, []) + [instance]
+                del instances[instances.index(instance)]
 
     return cluster_instances
