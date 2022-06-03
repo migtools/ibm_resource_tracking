@@ -87,7 +87,7 @@ def delete_cluster(id_or_name):
     elif remove_cluster_req.status_code == 500:
         print('Internal server error')
 
-    return False
+    return remove_cluster_req.status_code
 
 
 # Get all related instances of a cluster
