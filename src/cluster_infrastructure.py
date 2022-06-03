@@ -3,9 +3,9 @@ import requests
 
 from config_helper import get_cluster_access_token
 
-
-# Returns a list of dicts containing information about each cluster from the IBM API.
-def get_cluster_info():
+# Gets raw cluster information from the API. This includes all the data, not
+# filtered.
+def get_raw_cluster_info():
     access_token = get_cluster_access_token()
 
     # --- Clusters ---
@@ -23,7 +23,14 @@ def get_cluster_info():
     )
     get_vpc_clusters = json.loads(get_vpc_clusters_req.text)
 
-    all_clusters = get_classic_clusters + get_vpc_clusters
+    return get_classic_clusters + get_vpc_clusters
+
+
+# Returns a list of dicts containing information about each cluster from the IBM
+# API. NOTE: This data is filtered. If you want all of the data spat out by the
+# API, use "get_raw_cluster_info."
+def get_cluster_info():
+    all_clusters = get_raw_cluster_info()
 
     cluster_info = []
 
@@ -46,11 +53,11 @@ def get_cluster_info():
 # Deletes a cluster with the specified id or name. Returns True if successful,
 # False otherwise
 def delete_cluster(id_or_name):
-    all_cluster_info = get_cluster_info()
+    all_cluster_info = get_raw_cluster_info()
     this_cluster_info = None
 
     for info in all_cluster_info:
-        if info['cluster_id'] == id_or_name or info['name'] == id_or_name:
+        if info['id'] == id_or_name or info['name'] == id_or_name:
             this_cluster_info = info
             break
 
@@ -66,7 +73,7 @@ def delete_cluster(id_or_name):
     # https://cloud.ibm.com/apidocs/kubernetes#removecluster
     remove_cluster_req = requests.delete(
         'https://containers.cloud.ibm.com/global/v1/clusters/'
-        + info['cluster_id'] + '?deleteResources=true',
+        + info['id'] + '?deleteResources=true',
         headers={
             'Authorization': "bearer " + get_cluster_access_token(),
             'X-Auth-Resource-Group': this_cluster_info['resourceGroup']
