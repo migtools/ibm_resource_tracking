@@ -2,9 +2,9 @@ import boto3
 import os
 from datetime import datetime, timedelta
 
-
 from smtplib import SMTP_SSL as SMTP
 from email.mime.text import MIMEText
+
 
 class Emailer(object):
     def __init__(self, smtp_addr, username, password):
@@ -31,15 +31,13 @@ class Emailer(object):
             self.conn.quit()
 
 
-
 def send_email(aws_access_key_id, aws_secret_access_key, toaddresses, fromaddress, message):
-
     toaddresseslist = toaddresses.split(",")
 
     try:
         ses_client = boto3.client("ses", region_name="us-east-1",
-                                aws_access_key_id=aws_access_key_id, 
-                                aws_secret_access_key=aws_secret_access_key)
+                                  aws_access_key_id=aws_access_key_id,
+                                  aws_secret_access_key=aws_secret_access_key)
         CHARSET = "UTF-8"
 
         response = ses_client.send_email(
@@ -64,24 +62,20 @@ def send_email(aws_access_key_id, aws_secret_access_key, toaddresses, fromaddres
         print("Sending mail failed: {0}".format(e.message))
 
 
-
-def create_email_body(clusters,oldClustersSheet):
-
+def create_email_body(clusters, oldClustersSheet):
     existing_old_clusters = oldClustersSheet.read_spreadsheet(indexField='name')
-       
 
     sheet_link = os.environ['SHEET_LINK']
-    
+
     scheduled = (datetime.utcnow() + timedelta(days=4)).strftime("%a, %b %d, %y")
 
     summary_email = ""
 
-    for key,val in clusters.items():
+    for key, val in clusters.items():
         isSaved = existing_old_clusters.get(key, {}).get('save', '')
-        saved = 'Saved' if isSaved == 'Saved'  else 'Not Saved'
+        saved = 'Saved' if isSaved == 'save' else 'Not Saved'
 
-        summary_email += key + " ({} instances) ({})<br>".format(len(val),saved)
-         
+        summary_email += key + " ({} instances) ({})<br>".format(len(val), saved)
 
     message = """
     All,<br>
@@ -102,5 +96,5 @@ def create_email_body(clusters,oldClustersSheet):
     <br><br>
     Thank you.<br>
             """
-        
-    return message.format(sheet_link, sheet_link, scheduled,summary_email)
+
+    return message.format(sheet_link, sheet_link, scheduled, summary_email)
