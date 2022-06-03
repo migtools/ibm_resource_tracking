@@ -102,5 +102,6 @@ def group_cluster_resources(clusters, instances):
         for instance in instances:
             if cluster_id in instance['name']:
                 cluster_instances[cluster_name] = cluster_instances.get(cluster_name, []) + [instance]
+                del instances[instances.index(instance)]
 
     return cluster_instances
