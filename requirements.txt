@@ -2,6 +2,7 @@ ibm-cloud-sdk-core
 ibm-platform-services
 ibm-vpc
 requests
+boto3
 pytz==2022.1
 google-api-core==2.8.1
 google-api-python-client==2.49.0
