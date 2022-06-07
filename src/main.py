@@ -3,7 +3,7 @@ import os
 
 from cluster_infrastructure import get_cluster_info, group_cluster_resources
 from config_helper import get_aws_access_key_and_secret_key
-from emailer import send_email, create_email_body
+from emailer import send_email, create_email_body,create_deletedinstances_email_body
 from instance_operations import get_old_clusters_data, terminate_instances
 from resource_instances import get_instances
 from sheet import GoogleSheetEditor, format_sheet
@@ -68,6 +68,9 @@ def main(params):
     elif params['command'] == 'terminate_instances':
         deleted_instances = terminate_instances(allClustersSheet, oldClustersSheet)
         print("Clusters deleted" + str(deleted_instances))
+        email_body = create_deletedinstances_email_body(deleted_instances)
+        send_email(aws_access_key_id, aws_secret_access_key, os.getenv('SMTP_RECIEVERS'), os.getenv('SMTP_SENDER'),email_body
+                    )
 
 
 # Get the bill month from the event parameters
