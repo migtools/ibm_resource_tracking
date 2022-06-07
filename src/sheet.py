@@ -1,12 +1,12 @@
 from __future__ import print_function
-from urllib import response
+
+import datetime
+import os
 
 import pytz
-import pickle
-import os
-import datetime
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
+
 
 # Class to handle dealing with the Google Sheets API
 class GoogleSheetClient(object):
@@ -383,7 +383,7 @@ def format_sheet():
         ]
     }
 
-    response = client.service.spreadsheets().batchUpdate(
-        spreadsheetId = os.getenv("SHEET_ID"),
-        body = request_body
+    client.service.spreadsheets().batchUpdate(
+        spreadsheetId=os.getenv('GOOGLE_SHEET_ID'),
+        body=request_body
     ).execute()
