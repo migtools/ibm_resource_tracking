@@ -1,6 +1,6 @@
 import datetime
 
-# from cluster_infrastructure import delete_cluster
+from cluster_infrastructure import delete_cluster
 
 OLD_INSTANCE_THRESHOLD = 30
 

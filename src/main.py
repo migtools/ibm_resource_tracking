@@ -69,6 +69,7 @@ def main(params):
         deleted_instances = terminate_instances(allClustersSheet, oldClustersSheet)
         print("Clusters deleted" + str(deleted_instances))
         email_body = create_deletedinstances_email_body(deleted_instances)
+        aws_access_key_id, aws_secret_access_key = get_aws_access_key_and_secret_key()
         send_email(aws_access_key_id, aws_secret_access_key, os.getenv('SMTP_RECIEVERS'), os.getenv('SMTP_SENDER'),email_body
                     )
 
