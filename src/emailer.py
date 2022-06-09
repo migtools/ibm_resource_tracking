@@ -71,11 +71,18 @@ def create_email_body(clusters, oldClustersSheet):
 
     summary_email = ""
 
-    for key, val in clusters.items():
-        isSaved = existing_old_clusters.get(key, {}).get('save', '')
-        saved = 'Saved' if isSaved == 'save' else 'Not Saved'
+    tdelta= timedelta(days=0)
 
-        summary_email += key + " ({} instances) ({})<br>".format(len(val), saved)
+    for key, val in clusters.items():
+        if existing_old_clusters.get(key, {}).get('launchtime', '') != '':
+            launch_time = datetime.strptime(existing_old_clusters.get(key, {}).get('launchtime', ''), "%m/%d/%Y")
+            now = datetime.utcnow() + tdelta
+            
+            if (now - launch_time).days > 30:
+                isSaved = existing_old_clusters.get(key, {}).get('save', '')
+                saved = 'Saved' if isSaved == 'save' else 'Not Saved'
+
+                summary_email += key + " ({} instances) ({})<br>".format(len(val), saved)
 
     message = """
     All,<br>
@@ -98,3 +105,15 @@ def create_email_body(clusters, oldClustersSheet):
             """
 
     return message.format(sheet_link, sheet_link, scheduled, summary_email)
+
+
+def create_deletedinstances_email_body(deleted_instances):
+
+    message = """
+    All,<br>
+    <br>            
+    {} clusters terminated from IBM Cloud<br>
+    <br>
+    """
+
+    return message.format(deleted_instances)
