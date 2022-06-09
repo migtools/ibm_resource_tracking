@@ -29,10 +29,10 @@ Lambda creates a function and an execution role that grants the function permiss
 - Open the Secrets Manager console at https://console.aws.amazon.com/secretsmanager/.
 - Choose Store a new secret.
    - For Secret type, choose Other type of secret.
-   - In Key/value pairs, enter your secret (IBM_SECRETS_NAME)
-      a. Store ibm_iam_apikey and ibm_account_id
-   - Create another secret for AWS SES credentials (AWS_SES_SECRET_NAME)
-      a. Store AWS_ACCESS_KEY_ID and AWS_ACCESS_SECRET_KEY
+   - In Key/value pairs, enter your secret (IBM_SECRETS_NAME)<br>
+        a. Store ibm_iam_apikey and ibm_account_id
+   - Create another secret for AWS SES credentials (AWS_SES_SECRET_NAME)<br>
+        a. Store AWS_ACCESS_KEY_ID and AWS_ACCESS_SECRET_KEY
 - On the Review page, review your secret details, and then choose Store.
 
 ### Add permission to read Secrets From SecretManager to Lambda Function
