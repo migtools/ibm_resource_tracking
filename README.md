@@ -76,8 +76,8 @@ SHEET_ALL_VPCS="ALL VPCs"<br>
 SHEET_COST_SUMMARY="Cost Summary"<br>
 SHEET_OLD_CLUSTERS="Old Clusters"<br>
 SHEET_LINK=<google_sheet_link><br>
-SMTP_RECIEVERS=<receivers><br>
-SMTP_SENDER=<sender><br>
+SMTP_RECIEVERS= <receivers> (comma seperated) <br>
+SMTP_SENDER= <sender> <br>
 ```
    
 ### Schedule Execution of Lambda Function
