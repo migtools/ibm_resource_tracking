@@ -10,8 +10,8 @@ Setup Python [virtual environment](https://docs.python.org/3/library/venv.html)
    ```
 2. Activate the virtual environment and install the required packages
    ```
-      pip install -r requirements.txt
-
+      pip install --target ./package -r requirements.txt
+   ```
 ## Obtain credentials
 These scripts use Google service account credentials to allow bots to run the scripts.
 
@@ -80,3 +80,27 @@ SMTP_SENDER=<sender><br>
    
 ### Schedule Execution of Lambda Function
 [Schedule](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/RunLambdaSchedule.html#schedule-create-rule) AWS Lambda Functions Using EventBridge events.
+   
+### Upload code to Lambda Function
+A deployment package is required to create or update a Lambda function. The deployment package acts as the source bundle to run your function's code and dependencies on Lambda.
+
+#### To create the deployment package
+- Open a command prompt and navigate to the ibm_reporting project directory.
+- Install the required libraries to a new package directory
+  ```
+    pip install --target ./package -r requirements.txt
+   ```
+- Create a deployment package with the installed library at the root
+   ```
+   cd package
+   zip -r ../deployment-package.zip .
+   ```
+- Add all the files to the root of the zip file.
+   ```
+   cd ../src
+   zip -g deployment-package.zip *.py credentials.json 
+   ```
+   Note: (Credential file downloaded while Obtaining credetials above)
+
+#### Deploy your .zip file to the function 
+   To deploy the new code to your function, you upload the new .zip file deployment package. Use the [Lambda console](https://docs.aws.amazon.com/lambda/latest/dg/configuration-function-zip.html#configuration-function-update) to upload a .zip file to the function
