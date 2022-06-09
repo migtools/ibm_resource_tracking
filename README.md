@@ -61,23 +61,23 @@ Lambda creates a function and an execution role that grants the function permiss
 - Change the value of each key as per your needs
 
 ```
-AWS_SES_SECRET_NAME=<aws_stored_secret_name><br>
-GOOGLE_SHEET_ID=<sheet_id> <br>
-IBM_SECRETS_NAME=<aws_stored_secret_name><br>
-SECRETS_REGION=<region_where_secrets_are_stored_aws><br>
-IBM_VPC_Service_URL=https://us-east.iaas.cloud.ibm.com/v1 <br>
-SHEET_ALL_CLUSTERS="All Clusters"<br>
-SHEET_ALL_CLUSTER_INSTANCES="All Cluster Instances"<br>
-SHEET_ALL_GATEWAYS="All Gateways"<br>
-SHEET_ALL_SUBNETS="All Subnets"<br>
-SHEET_ALL_INSTANCES="All Instances"<br>
-SHEET_ALL_INSTANCES_COST="All Instances Cost"<br>
-SHEET_ALL_VPCS="ALL VPCs"<br>
-SHEET_COST_SUMMARY="Cost Summary"<br>
-SHEET_OLD_CLUSTERS="Old Clusters"<br>
-SHEET_LINK=<google_sheet_link><br>
-SMTP_RECIEVERS= <receivers> (comma seperated) <br>
-SMTP_SENDER= <sender> <br>
+AWS_SES_SECRET_NAME=<aws_stored_secret_name>
+GOOGLE_SHEET_ID=<sheet_id>
+IBM_SECRETS_NAME=<aws_stored_secret_name>
+SECRETS_REGION=<region_where_secrets_are_stored_aws>
+IBM_VPC_Service_URL=https://us-east.iaas.cloud.ibm.com/v1
+SHEET_ALL_CLUSTERS="All Clusters"
+SHEET_ALL_CLUSTER_INSTANCES="All Cluster Instances"
+SHEET_ALL_GATEWAYS="All Gateways"
+SHEET_ALL_SUBNETS="All Subnets"
+SHEET_ALL_INSTANCES="All Instances"
+SHEET_ALL_INSTANCES_COST="All Instances Cost"
+SHEET_ALL_VPCS="ALL VPCs"
+SHEET_COST_SUMMARY="Cost Summary"
+SHEET_OLD_CLUSTERS="Old Clusters"
+SHEET_LINK=<google_sheet_link>
+SMTP_RECIEVERS= <receivers> (comma seperated)
+SMTP_SENDER= <sender>
 ```
    
 ### Schedule Execution of Lambda Function
