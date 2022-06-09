@@ -40,26 +40,27 @@ Lambda creates a function and an execution role that grants the function permiss
 - Choose your function.
 - Choose Configuration and then choose Permissions and you will see the execution role.
 - Go to execution role and add an inline policy
-  ```
-   {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "VisualEditor0",
-            "Effect": "Allow",
-            "Action": "secretsmanager:GetSecretValue",
-            "Resource": [
-                "<arn of ibm secrets created above in secret manager>",
-                "<arn of aws_ses secrets created above in secret manager>"
-            ]
-        }
-      ]
-   }
-  ```
+```
+{
+ "Version": "2012-10-17",
+ "Statement": [
+     {
+         "Sid": "VisualEditor0",
+         "Effect": "Allow",
+         "Action": "secretsmanager:GetSecretValue",
+         "Resource": [
+             "<arn of ibm secrets created above in secret manager>",
+             "<arn of aws_ses secrets created above in secret manager>"
+         ]
+     }
+   ]
+}
+```
 
 ### Set AWS Lambda Function Environment Variables
 - Change the value of each key as per your needs
 
+```
 AWS_SES_SECRET_NAME=<aws_stored_secret_name><br>
 GOOGLE_SHEET_ID=<sheet_id> <br>
 IBM_SECRETS_NAME=<aws_stored_secret_name><br>
@@ -77,6 +78,7 @@ SHEET_OLD_CLUSTERS="Old Clusters"<br>
 SHEET_LINK=<google_sheet_link><br>
 SMTP_RECIEVERS=<receivers><br>
 SMTP_SENDER=<sender><br>
+```
    
 ### Schedule Execution of Lambda Function
 [Schedule](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/RunLambdaSchedule.html#schedule-create-rule) AWS Lambda Functions Using EventBridge events.
