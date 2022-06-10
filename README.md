@@ -6,7 +6,7 @@ Setup Python [virtual environment](https://docs.python.org/3/library/venv.html)
 
 1. Clone this repository
    ```
-      git clone https://github.com/amundra02/ibm_reporting.git
+      git clone https://github.com/konveyor/ibm_resource_tracking.git
    ```
 2. Activate the virtual environment and install the required packages
    ```
