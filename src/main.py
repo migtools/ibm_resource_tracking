@@ -25,6 +25,7 @@ def main(params):
     allVPCsSheetName = os.getenv('SHEET_ALL_VPCS')
     allSubnetsSheetName = os.getenv('SHEET_ALL_SUBNETS')
     allGatewaysSheetName = os.getenv('SHEET_ALL_GATEWAYS')
+    historicalDeletionSumamrySheetName = os.getenv('HISTORICAL_DELETION_SUMMARY')
 
     allInstancesSheet = GoogleSheetEditor(sheet_id, allInstancesSheetName)
     allClustersInstancesSheet = GoogleSheetEditor(sheet_id, allClusterInstancesSheetName)
@@ -35,6 +36,7 @@ def main(params):
     allVPCsSheet = GoogleSheetEditor(sheet_id, allVPCsSheetName)
     allSubnetsSheet = GoogleSheetEditor(sheet_id, allSubnetsSheetName)
     allGatewaysSheet = GoogleSheetEditor(sheet_id, allGatewaysSheetName)
+    historicalDeletionSheet = GoogleSheetEditor(sheet_id, historicalDeletionSumamrySheetName)
 
     if params['command'] == 'report':
         account_summary = get_account_summary(bill_month)
@@ -59,7 +61,8 @@ def main(params):
         instances, _ = get_instances()
         clusters = get_cluster_info()
         grouped_cluster_instances = group_cluster_resources(clusters, instances)
-        email_body = create_email_body(grouped_cluster_instances, oldClustersSheet)
+        deleted_instances_info = historicalDeletionSheet.read_spreadsheet()[-1]
+        email_body = create_email_body(grouped_cluster_instances, oldClustersSheet,deleted_instances_info)
         aws_access_key_id, aws_secret_access_key = get_aws_access_key_and_secret_key()
         send_email(aws_access_key_id, aws_secret_access_key, os.getenv('SMTP_RECIEVERS'), os.getenv('SMTP_SENDER'),
                    email_body)
@@ -68,10 +71,14 @@ def main(params):
     elif params['command'] == 'terminate_instances':
         deleted_instances = terminate_instances(allClustersSheet, oldClustersSheet)
         print("Clusters deleted" + str(deleted_instances))
-        email_body = create_deletedinstances_email_body(deleted_instances)
-        aws_access_key_id, aws_secret_access_key = get_aws_access_key_and_secret_key()
-        send_email(aws_access_key_id, aws_secret_access_key, os.getenv('SMTP_RECIEVERS'), os.getenv('SMTP_SENDER'),email_body
-                    )
+       
+        #append current date and number of terminated instaces to the sheet
+        deletion_data = [
+        {"date_deleted":  datetime.datetime.now().strftime('%m/%d/%Y'),
+         "no_of_deleted_clusters":deleted_instances
+        }]
+
+        print(historicalDeletionSheet.append_data_to_sheet(deletion_data))
 
 
 # Get the bill month from the event parameters
