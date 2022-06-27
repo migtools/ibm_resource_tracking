@@ -86,7 +86,7 @@ def delete_cluster(id_or_name):
         print(f'Removed cluster with id or name: "{id_or_name}"')
         return True
 
-    if remove_cluster_req.status_code == 401:
+    elif remove_cluster_req.status_code == 401:
         print('Unauthorized. The IAM token is invalid or expired.')
     elif remove_cluster_req.status_code == 404:
         print('The cluster with the following id or name could not be found: "' 
@@ -94,7 +94,7 @@ def delete_cluster(id_or_name):
     elif remove_cluster_req.status_code == 500:
         print('Internal server error')
 
-    return remove_cluster_req.status_code
+    return False
 
 
 # Get all related instances of a cluster
