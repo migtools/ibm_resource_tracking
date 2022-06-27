@@ -24,14 +24,18 @@ def terminate_instances(all_instances_sheet, old_instances_sheet):
     old_instances = get_old_clusters_data(all_instances_sheet, old_instances_sheet, datetime.timedelta(days=-4))
     instance_ids = []
     deleted_instances = 0
+    deleted_clusters_names = []
     for inst in old_instances:
         if 'save' not in inst['save'].lower():
             instance_id = inst['cluster_id']
             instance_region = inst["region"]
-            instance_ids.append([instance_id, instance_region])
+            instance_name = inst["name"]
+            instance_ids.append([instance_id, instance_region, instance_name])
 
     for inst in instance_ids:
         responseCode = delete_cluster(inst[0])
         if responseCode == 200:
             deleted_instances += 1
-    return deleted_instances
+            deleted_clusters_names.append(inst[2])
+
+    return deleted_instances,deleted_clusters_names

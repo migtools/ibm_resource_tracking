@@ -69,12 +69,13 @@ def main(params):
         print(email_body)
 
     elif params['command'] == 'terminate_instances':
-        deleted_instances = terminate_instances(allClustersSheet, oldClustersSheet)
+        deleted_instances,deleted_clusters_names = terminate_instances(allClustersSheet, oldClustersSheet)
         print("Clusters deleted" + str(deleted_instances))
        
         #append current date and number of terminated instaces to the sheet
         deletion_data = [
         {"date_deleted":  datetime.datetime.now().strftime('%m/%d/%Y'),
+         "deleted_clusters": ",".join(deleted_clusters_names),
          "no_of_deleted_clusters":deleted_instances
         }]
 
