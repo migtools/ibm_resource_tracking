@@ -61,7 +61,14 @@ def main(params):
         instances, _ = get_instances()
         clusters = get_cluster_info()
         grouped_cluster_instances = group_cluster_resources(clusters, instances)
-        deleted_instances_info = historicalDeletionSheet.read_spreadsheet()[-1]
+        historical_data = historicalDeletionSheet.read_spreadsheet()
+        if len(historical_data) > 0:
+                deleted_instances_info = historical_data[-1]
+        else:
+            deleted_instances_info = {}
+            deleted_instances_info['no_of_deleted_clusters'] = 0
+            deleted_instances_info['date_deleted'] = datetime.datetime.now().strftime('%m/%d/%Y')
+
         email_body = create_email_body(grouped_cluster_instances, oldClustersSheet,deleted_instances_info)
         aws_access_key_id, aws_secret_access_key = get_aws_access_key_and_secret_key()
         send_email(aws_access_key_id, aws_secret_access_key, os.getenv('SMTP_RECIEVERS'), os.getenv('SMTP_SENDER'),
