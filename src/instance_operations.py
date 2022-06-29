@@ -33,8 +33,8 @@ def terminate_instances(all_instances_sheet, old_instances_sheet):
             instance_ids.append([instance_id, instance_region, instance_name])
 
     for inst in instance_ids:
-        responseCode = delete_cluster(inst[0])
-        if responseCode == 200:
+        successful = delete_cluster(inst[0])
+        if successful:
             deleted_instances += 1
             deleted_clusters_names.append(inst[2])
 
