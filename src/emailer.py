@@ -62,7 +62,7 @@ def send_email(aws_access_key_id, aws_secret_access_key, toaddresses, fromaddres
         print("Sending mail failed: {0}".format(e.message))
 
 
-def create_email_body(clusters, oldClustersSheet):
+def create_email_body(clusters, oldClustersSheet,deleted_instances_info):
     existing_old_clusters = oldClustersSheet.read_spreadsheet(indexField='name')
 
     sheet_link = os.environ['SHEET_LINK']
@@ -101,19 +101,8 @@ def create_email_body(clusters, oldClustersSheet):
     <br><br>
     {}
     <br><br>
-    Thank you.<br>
+    Thank you.<br><br>
+    {} clusters previously terminated from IBM Cloud on {}<br><br>
             """
 
-    return message.format(sheet_link, sheet_link, scheduled, summary_email)
-
-
-def create_deletedinstances_email_body(deleted_instances):
-
-    message = """
-    All,<br>
-    <br>            
-    {} clusters terminated from IBM Cloud<br>
-    <br>
-    """
-
-    return message.format(deleted_instances)
+    return message.format(sheet_link, sheet_link, scheduled, summary_email,deleted_instances_info['no_of_deleted_clusters'],deleted_instances_info['date_deleted'])

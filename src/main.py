@@ -25,6 +25,7 @@ def main(params):
     allVPCsSheetName = os.getenv('SHEET_ALL_VPCS')
     allSubnetsSheetName = os.getenv('SHEET_ALL_SUBNETS')
     allGatewaysSheetName = os.getenv('SHEET_ALL_GATEWAYS')
+    historicalDeletionSumamrySheetName = os.getenv('HISTORICAL_DELETION_SUMMARY')
 
     allInstancesSheet = GoogleSheetEditor(sheet_id, allInstancesSheetName)
     allClustersInstancesSheet = GoogleSheetEditor(sheet_id, allClusterInstancesSheetName)
@@ -35,6 +36,7 @@ def main(params):
     allVPCsSheet = GoogleSheetEditor(sheet_id, allVPCsSheetName)
     allSubnetsSheet = GoogleSheetEditor(sheet_id, allSubnetsSheetName)
     allGatewaysSheet = GoogleSheetEditor(sheet_id, allGatewaysSheetName)
+    historicalDeletionSheet = GoogleSheetEditor(sheet_id, historicalDeletionSumamrySheetName)
 
     if params['command'] == 'report':
         account_summary = get_account_summary(bill_month)
@@ -59,19 +61,32 @@ def main(params):
         instances, _ = get_instances()
         clusters = get_cluster_info()
         grouped_cluster_instances = group_cluster_resources(clusters, instances)
-        email_body = create_email_body(grouped_cluster_instances, oldClustersSheet)
+        historical_data = historicalDeletionSheet.read_spreadsheet()
+        if len(historical_data) > 0:
+                deleted_instances_info = historical_data[-1]
+        else:
+            deleted_instances_info = {}
+            deleted_instances_info['no_of_deleted_clusters'] = 0
+            deleted_instances_info['date_deleted'] = datetime.datetime.now().strftime('%m/%d/%Y')
+
+        email_body = create_email_body(grouped_cluster_instances, oldClustersSheet,deleted_instances_info)
         aws_access_key_id, aws_secret_access_key = get_aws_access_key_and_secret_key()
         send_email(aws_access_key_id, aws_secret_access_key, os.getenv('SMTP_RECIEVERS'), os.getenv('SMTP_SENDER'),
                    email_body)
         print(email_body)
 
     elif params['command'] == 'terminate_instances':
-        deleted_instances = terminate_instances(allClustersSheet, oldClustersSheet)
+        deleted_instances,deleted_clusters_names = terminate_instances(allClustersSheet, oldClustersSheet)
         print("Clusters deleted" + str(deleted_instances))
-        email_body = create_deletedinstances_email_body(deleted_instances)
-        aws_access_key_id, aws_secret_access_key = get_aws_access_key_and_secret_key()
-        send_email(aws_access_key_id, aws_secret_access_key, os.getenv('SMTP_RECIEVERS'), os.getenv('SMTP_SENDER'),email_body
-                    )
+       
+        #append current date and number of terminated instaces to the sheet
+        deletion_data = [
+        {"date_deleted":  datetime.datetime.now().strftime('%m/%d/%Y'),
+         "deleted_clusters": ",".join(deleted_clusters_names),
+         "no_of_deleted_clusters":deleted_instances
+        }]
+
+        print(historicalDeletionSheet.append_data_to_sheet(deletion_data))
 
 
 # Get the bill month from the event parameters
