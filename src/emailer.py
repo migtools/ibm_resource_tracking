@@ -62,28 +62,38 @@ def send_email(aws_access_key_id, aws_secret_access_key, toaddresses, fromaddres
         print("Sending mail failed: {0}".format(e.message))
 
 
-def create_email_body(clusters, oldClustersSheet,deleted_instances_info):
-    existing_old_clusters = oldClustersSheet.read_spreadsheet(indexField='name')
-
-    sheet_link = os.environ['SHEET_LINK']
-
-    scheduled = (datetime.utcnow() + timedelta(days=4)).strftime("%a, %b %d, %y")
-
+def create_email_body(oldClustersSheet):
+    old_instances = oldClustersSheet.read_spreadsheet()
     summary_email = ""
 
-    tdelta= timedelta(days=0)
+    for instance in old_instances:
+        if 'save' not in instance['save'].lower():
+            summary_email += instance['name'] + " ({} instances) ({})<br>".format(instance['worker_count'], "Not Saved")
+        else:
+            summary_email += instance['name'] + " ({} instances) ({})<br>".format(instance['worker_count'], "Saved")
+    return summary_email
 
-    for key, val in clusters.items():
-        if existing_old_clusters.get(key, {}).get('launchtime', '') != '':
-            launch_time = datetime.strptime(existing_old_clusters.get(key, {}).get('launchtime', ''), "%m/%d/%Y")
-            now = datetime.utcnow() + tdelta
-            
-            if (now - launch_time).days > 30:
-                isSaved = existing_old_clusters.get(key, {}).get('save', '')
-                saved = 'Saved' if isSaved == 'save' else 'Not Saved'
 
-                summary_email += key + " ({} instances) ({})<br>".format(len(val), saved)
+def termination_email_body(oldClustersSheet, deleted_instances_info):
+    summary_email = create_email_body(oldClustersSheet)
+    scheduled = (datetime.utcnow() + timedelta(days=4)).strftime("%a, %b %d, %y")
 
+    if len(summary_email) > 0 or int(deleted_instances_info['no_of_deleted_clusters']) > 0:
+        return email_format(deleted_instances_info, scheduled, summary_email)
+    return ""
+
+
+def reminder_email_body(oldClustersSheet, deleted_instances_info):
+    summary_email = create_email_body(oldClustersSheet)
+    scheduled = (datetime.utcnow() + timedelta(days=1)).strftime("%a, %b %d, %y")
+
+    if len(summary_email) > 0:
+        return email_format(deleted_instances_info, scheduled, summary_email)
+    return summary_email
+
+
+def email_format(deleted_instances_info, scheduled, summary_email):
+    sheet_link = os.environ['SHEET_LINK']
     message = """
     All,<br>
     <br>            
@@ -104,5 +114,5 @@ def create_email_body(clusters, oldClustersSheet,deleted_instances_info):
     Thank you.<br><br>
     {} clusters previously terminated from IBM Cloud on {}<br><br>
             """
-
-    return message.format(sheet_link, sheet_link, scheduled, summary_email,deleted_instances_info['no_of_deleted_clusters'],deleted_instances_info['date_deleted'])
+    return message.format(sheet_link, sheet_link, scheduled, summary_email,
+                          deleted_instances_info['no_of_deleted_clusters'], deleted_instances_info['date_deleted'])

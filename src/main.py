@@ -1,9 +1,9 @@
 import datetime
 import os
 
-from cluster_infrastructure import get_cluster_info, group_cluster_resources
+from cluster_infrastructure import get_cluster_info
 from config_helper import get_aws_access_key_and_secret_key
-from emailer import send_email, create_email_body,create_deletedinstances_email_body
+from emailer import send_email, create_email_body, termination_email_body, reminder_email_body
 from instance_operations import get_old_clusters_data, terminate_instances
 from resource_instances import get_instances
 from sheet import GoogleSheetEditor, format_sheet
@@ -25,7 +25,7 @@ def main(params):
     allVPCsSheetName = os.getenv('SHEET_ALL_VPCS')
     allSubnetsSheetName = os.getenv('SHEET_ALL_SUBNETS')
     allGatewaysSheetName = os.getenv('SHEET_ALL_GATEWAYS')
-    historicalDeletionSumamrySheetName = os.getenv('HISTORICAL_DELETION_SUMMARY')
+    historicalDeletionSummarySheetName = os.getenv('HISTORICAL_DELETION_SUMMARY')
 
     allInstancesSheet = GoogleSheetEditor(sheet_id, allInstancesSheetName)
     allClustersInstancesSheet = GoogleSheetEditor(sheet_id, allClusterInstancesSheetName)
@@ -36,7 +36,7 @@ def main(params):
     allVPCsSheet = GoogleSheetEditor(sheet_id, allVPCsSheetName)
     allSubnetsSheet = GoogleSheetEditor(sheet_id, allSubnetsSheetName)
     allGatewaysSheet = GoogleSheetEditor(sheet_id, allGatewaysSheetName)
-    historicalDeletionSheet = GoogleSheetEditor(sheet_id, historicalDeletionSumamrySheetName)
+    historicalDeletionSheet = GoogleSheetEditor(sheet_id, historicalDeletionSummarySheetName)
 
     if params['command'] == 'report':
         account_summary = get_account_summary(bill_month)
@@ -53,40 +53,51 @@ def main(params):
         print(allVPCsSheet.save_data_to_sheet(vpc_infrastructure_data['VPCs']))
         print(allSubnetsSheet.save_data_to_sheet(vpc_infrastructure_data['Subnets']))
         print(allGatewaysSheet.save_data_to_sheet(vpc_infrastructure_data['Public Gateways']))
-        old_clusters = get_old_clusters_data(allClustersSheet, oldClustersSheet, tdelta=datetime.timedelta(days=0))
-        print(oldClustersSheet.save_data_to_sheet(old_clusters))
         format_sheet()
 
     elif params['command'] == 'generate_termination_email_summary':
-        instances, _ = get_instances()
-        clusters = get_cluster_info()
-        grouped_cluster_instances = group_cluster_resources(clusters, instances)
-        historical_data = historicalDeletionSheet.read_spreadsheet()
-        if len(historical_data) > 0:
-                deleted_instances_info = historical_data[-1]
-        else:
-            deleted_instances_info = {}
-            deleted_instances_info['no_of_deleted_clusters'] = 0
-            deleted_instances_info['date_deleted'] = datetime.datetime.now().strftime('%m/%d/%Y')
+        old_clusters = get_old_clusters_data(allClustersSheet, oldClustersSheet)
+        print(oldClustersSheet.save_data_to_sheet(old_clusters))
+        deleted_instances_info = get_deleted_instances(historicalDeletionSheet)
+        email_body = termination_email_body(oldClustersSheet, deleted_instances_info)
+        send_out_email(email_body)
+        print("Termination Email", email_body)
 
-        email_body = create_email_body(grouped_cluster_instances, oldClustersSheet,deleted_instances_info)
+    elif params['command'] == 'termination_reminder':
+        deleted_instances_info = get_deleted_instances(historicalDeletionSheet)
+        email_body = reminder_email_body(oldClustersSheet, deleted_instances_info)
+        send_out_email(email_body)
+        print("Reminder Email", email_body)
+
+    elif params['command'] == 'terminate_instances':
+        deleted_instances, deleted_clusters_names = terminate_instances(oldClustersSheet)
+        print("Clusters deleted" + str(deleted_instances))
+
+        # append current date and number of terminated instances to the sheet
+        deletion_data = [
+            {"date_deleted": str(datetime.datetime.now().date()),
+             "deleted_clusters": ",".join(deleted_clusters_names),
+             "no_of_deleted_clusters": deleted_instances
+             }]
+
+        print(historicalDeletionSheet.append_data_to_sheet(deletion_data))
+
+
+def send_out_email(email_body):
+    if len(email_body) > 0:
         aws_access_key_id, aws_secret_access_key = get_aws_access_key_and_secret_key()
         send_email(aws_access_key_id, aws_secret_access_key, os.getenv('SMTP_RECIEVERS'), os.getenv('SMTP_SENDER'),
                    email_body)
-        print(email_body)
 
-    elif params['command'] == 'terminate_instances':
-        deleted_instances,deleted_clusters_names = terminate_instances(allClustersSheet, oldClustersSheet)
-        print("Clusters deleted" + str(deleted_instances))
-       
-        #append current date and number of terminated instaces to the sheet
-        deletion_data = [
-        {"date_deleted":  datetime.datetime.now().strftime('%m/%d/%Y'),
-         "deleted_clusters": ",".join(deleted_clusters_names),
-         "no_of_deleted_clusters":deleted_instances
-        }]
 
-        print(historicalDeletionSheet.append_data_to_sheet(deletion_data))
+def get_deleted_instances(historicalDeletionSheet):
+    historical_data = historicalDeletionSheet.read_spreadsheet()
+    if len(historical_data) > 0:
+        deleted_instances_info = historical_data[-1]
+    else:
+        deleted_instances_info = {'no_of_deleted_clusters': 0,
+                                  'date_deleted': str(datetime.datetime.now().date())}
+    return deleted_instances_info
 
 
 # Get the bill month from the event parameters

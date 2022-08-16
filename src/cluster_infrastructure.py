@@ -62,7 +62,8 @@ def delete_cluster(id_or_name):
             break
 
     if this_cluster_info is None:
-        raise Exception('Cluster with id or name "' + id_or_name + '" does not exist!')
+        print('Cluster with id or name "' + id_or_name + '" does not exist!')
+        return False
 
     print(json.dumps(this_cluster_info))
 
@@ -89,7 +90,7 @@ def delete_cluster(id_or_name):
     if remove_cluster_req.status_code == 401:
         print('Unauthorized. The IAM token is invalid or expired.')
     elif remove_cluster_req.status_code == 404:
-        print('The cluster with the following id or name could not be found: "' 
+        print('The cluster with the following id or name could not be found: "'
             + id_or_name + '"')
     elif remove_cluster_req.status_code == 500:
         print('Internal server error')
