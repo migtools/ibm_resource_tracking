@@ -100,7 +100,7 @@ A deployment package is required to create or update a Lambda function. The depl
 - Add all the files to the root of the zip file.
    ```
    cd ../src
-   zip -g deployment-package.zip *.py credentials.json 
+   zip -g ../deployment-package.zip *.py credentials.json 
    ```
    Note: (Credential file downloaded while Obtaining credetials above)
 
