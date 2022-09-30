@@ -1,9 +1,9 @@
-import boto3
 import os
 from datetime import datetime, timedelta
-
-from smtplib import SMTP_SSL as SMTP
 from email.mime.text import MIMEText
+from smtplib import SMTP_SSL as SMTP
+
+import boto3
 
 
 class Emailer(object):
@@ -67,7 +67,7 @@ def create_email_body(oldClustersSheet):
     summary_email = ""
 
     for instance in old_instances:
-        if 'save' not in instance['save'].lower():
+        if 'save' not in instance['saved'].lower():
             summary_email += instance['name'] + " ({} instances) ({})<br>".format(instance['worker_count'], "Not Saved")
         else:
             summary_email += instance['name'] + " ({} instances) ({})<br>".format(instance['worker_count'], "Saved")
@@ -99,7 +99,7 @@ def email_format(deleted_instances_info, scheduled, summary_email):
     <br>            
     This is a reminder to let you know that the IBM cleanup automation script will terminate some of the long running instances.<br>
     <br>
-    You can save your instances from automatic deletion by writing 'Save' in the 'Saved' column in 'All Clusters' spreadsheet below:
+    You can save your instances from automatic deletion by writing <b>"Save"</b> in the <b>"Saved"</b> column in <b>"Old Clusters"</b> tab spreadsheet below:
     <br>
     <br>
     <a href="{}">{}</a>
