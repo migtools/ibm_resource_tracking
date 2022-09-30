@@ -1,7 +1,9 @@
 import json
+
 import requests
 
 from config_helper import get_cluster_access_token
+
 
 # Gets raw cluster information from the API. This includes all the data, not
 # filtered.
@@ -43,8 +45,7 @@ def get_cluster_info():
             'name': cluster['name'],
             'region': cluster['region'],
             'launchtime': created_at,
-            'worker_count': cluster['workerCount'],
-            'save': ''
+            'worker_count': cluster['workerCount']
         })
 
     return cluster_info

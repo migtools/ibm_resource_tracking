@@ -1,9 +1,11 @@
-import datetime
 import os
+from datetime import datetime
+
+import pytz
 
 from cluster_infrastructure import get_cluster_info
 from config_helper import get_aws_access_key_and_secret_key
-from emailer import send_email, create_email_body, termination_email_body, reminder_email_body
+from emailer import send_email, termination_email_body, reminder_email_body
 from instance_operations import get_old_clusters_data, terminate_instances
 from resource_instances import get_instances
 from sheet import GoogleSheetEditor, format_sheet
@@ -74,8 +76,9 @@ def main(params):
         print("Clusters deleted" + str(deleted_instances))
 
         # append current date and number of terminated instances to the sheet
+        now = datetime.now(pytz.timezone('US/Eastern')).strftime("%H:%M:%S %B %d, %Y")
         deletion_data = [
-            {"date_deleted": str(datetime.datetime.now().date()),
+            {"date_deleted": now,
              "deleted_clusters": ",".join(deleted_clusters_names),
              "no_of_deleted_clusters": deleted_instances
              }]
@@ -95,8 +98,9 @@ def get_deleted_instances(historicalDeletionSheet):
     if len(historical_data) > 0:
         deleted_instances_info = historical_data[-1]
     else:
+        now = datetime.now(pytz.timezone('US/Eastern')).strftime("%H:%M:%S %B %d, %Y")
         deleted_instances_info = {'no_of_deleted_clusters': 0,
-                                  'date_deleted': str(datetime.datetime.now().date())}
+                                  'date_deleted': now}
     return deleted_instances_info
 
 
@@ -105,6 +109,6 @@ def get_bill_month(params):
     if 'bill_month' in params:
         bill_month = params['bill_month']
     else:
-        now = datetime.datetime.now()
+        now = datetime.now()
         bill_month = str(now.year) + "-" + str(now.month)
     return bill_month
